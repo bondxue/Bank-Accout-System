@@ -30,6 +30,30 @@ def main():
     except AttributeError as ex:
         print(ex)
 
+    # # test interest
+    # a1 = Account(1234, 'Monty', 'Python', initial_balance=0)
+    # a2 = Account(2345, 'John', 'Cheese', initial_balance=0)
+    # print(a1.interest_rate, a2.interest_rate)
+    #
+    # Account.interest_rate = 0.025
+    # print(a1.interest_rate, a2.interest_rate)
+
+    # test class method of getter and setter for interest rate
+    print(Account.get_interest_rate())
+
+    Account.set_interest_rate(10)
+    print(Account.get_interest_rate())
+
+    try:
+        Account.set_interest_rate(-10)
+    except ValueError as ex:
+        print(ex)
+
+    try:
+        Account.set_interest_rate(1 + 1j)
+    except ValueError as ex:
+        print(ex)
+
 
 if __name__ == '__main__':
     main()

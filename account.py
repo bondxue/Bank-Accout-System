@@ -1,9 +1,11 @@
 import itertools
 from time_zone import TimeZone
+import numbers
 
 
 class Account:
     transaction_counter = itertools.count(100)
+    _interest_rate = 0.5  # percent
 
     def __init__(self, account_number, first_name, last_name,
                  timezone=None, initial_balance=0):
@@ -57,6 +59,18 @@ class Account:
         if not isinstance(value, TimeZone):
             raise ValueError('Time zone must be a valid TimeZone object.')
         self._timezone = value
+
+    @classmethod
+    def get_interest_rate(cls):
+        return cls._interest_rate
+
+    @classmethod
+    def set_interest_rate(cls, value):
+        if not isinstance(value, numbers.Real):
+            raise ValueError('Interest rate must be a real number')
+        if value < 0:
+            raise ValueError('Interest rate cannot be negative.')
+        cls._interest_rate = value
 
     def validate_and_set_name(self, property_name, value, field_title):
         if value is None or len(str(value).strip()) == 0:
