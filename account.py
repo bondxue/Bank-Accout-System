@@ -1,14 +1,21 @@
 import itertools
+from time_zone import TimeZone
 
 
 class Account:
     transaction_counter = itertools.count(100)
 
-    def __init__(self, account_number, first_name, last_name):
-        # in practice we probably would want to add checks to make sure these values are valid / non-empty
+    def __init__(self, account_number, first_name, last_name,
+                 timezone=None):
+        # in practice we probably would want to add checks to make
+        # sure these values are valid / non-empty
         self._account_number = account_number
         self.first_name = first_name
         self.last_name = last_name
+
+        if timezone is None:
+            timezone = TimeZone('UTC', 0, 0)
+        self.timezone = timezone
 
     @property
     def account_number(self):
@@ -20,7 +27,7 @@ class Account:
 
     @first_name.setter
     def first_name(self, value):
-        self._first_name = Account.validate_name(value, 'First Name')
+        self.validate_and_set_name('_first_name', value, 'First Name')
 
     @property
     def last_name(self):
@@ -28,15 +35,24 @@ class Account:
 
     @last_name.setter
     def last_name(self, value):
-        self._last_name = Account.validate_name(value, 'Last Name')
+        self.validate_and_set_name('_last_name', value, 'Last Name')
 
     # also going to create a full_name computed property, for ease of use
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
-    @staticmethod
-    def validate_name(value, field_title):
+    @property
+    def timezone(self):
+        return self._timezone
+
+    @timezone.setter
+    def timezone(self, value):
+        if not isinstance(value, TimeZone):
+            raise ValueError('Time zone must be a valid TimeZone object.')
+        self._timezone = value
+
+    def validate_and_set_name(self, property_name, value, field_title):
         if value is None or len(str(value).strip()) == 0:
             raise ValueError(f'{field_title} cannot be empty.')
-        return str(value).strip()
+        setattr(self, property_name, value)
