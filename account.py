@@ -6,7 +6,7 @@ class Account:
     transaction_counter = itertools.count(100)
 
     def __init__(self, account_number, first_name, last_name,
-                 timezone=None):
+                 timezone=None, initial_balance=0):
         # in practice we probably would want to add checks to make
         # sure these values are valid / non-empty
         self._account_number = account_number
@@ -16,6 +16,8 @@ class Account:
         if timezone is None:
             timezone = TimeZone('UTC', 0, 0)
         self.timezone = timezone
+
+        self._balance = float(initial_balance)
 
     @property
     def account_number(self):
@@ -41,6 +43,10 @@ class Account:
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
+
+    @property
+    def balance(self):
+        return self._balance
 
     @property
     def timezone(self):
