@@ -1,7 +1,10 @@
 import itertools
 from time_zone import TimeZone
 import numbers
+from datetime import datetime
+from collections import namedtuple
 
+Confirmation = namedtuple('Confirmation', 'account_number, transaction_code, transaction_id, time_utc, time')
 
 class Account:
     transaction_counter = itertools.count(100)
@@ -83,3 +86,42 @@ class Account:
         if value is None or len(str(value).strip()) == 0:
             raise ValueError(f'{field_title} cannot be empty.')
         setattr(self, property_name, value)
+
+    def generate_confirmation_code(self, transaction_code):
+        # main difficulty here is to generate the current time in UTC using this formatting:
+        # YYYYMMDDHHMMSS
+        dt_str = datetime.utcnow().strftime('%Y%m%d%H%M%S')
+        return f'{transaction_code}-{self.account_number}-{dt_str}-{next(Account.transaction_counter)}'
+
+    # test transaction function
+    def make_transaction(self):
+        return self.generate_confirmation_code('dummy')
+
+    @staticmethod
+    def parse_confirmation_code(confirmation_code, preferred_time_zone=None):
+        # dummy-A100-20190325224918-101
+        parts = confirmation_code.split('-')
+        if len(parts) != 4:
+            # really simplistic validation here - would need something better
+            raise ValueError('Invalid confirmation code')
+
+        # unpack into separate variables
+        transaction_code, account_number, raw_dt_utc, transaction_id = parts
+
+        # need to convert raw_dt_utc into a proper datetime object
+        try:
+            dt_utc = datetime.strptime(raw_dt_utc, '%Y%m%d%H%M%S')
+        except ValueError as ex:
+            # again, probably need better error handling here
+            raise ValueError('Invalid transaction datetime') from ex
+
+        if preferred_time_zone is None:
+            preferred_time_zone = TimeZone('UTC', 0, 0)
+
+        if not isinstance(preferred_time_zone, TimeZone):
+            raise ValueError('Invalid TimeZone specified.')
+
+        dt_preferred = dt_utc + preferred_time_zone.offset
+        dt_preferred_str = f"{dt_preferred.strftime('%Y-%m-%d %H:%M:%S')} ({preferred_time_zone.name})"
+
+        return Confirmation(account_number, transaction_code, transaction_id, dt_utc.isoformat(), dt_preferred_str)

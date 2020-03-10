@@ -1,5 +1,5 @@
 from account import Account
-
+from time_zone import TimeZone
 
 def main():
     # test validate name property
@@ -51,6 +51,25 @@ def main():
 
     try:
         Account.set_interest_rate(1 + 1j)
+    except ValueError as ex:
+        print(ex)
+
+    # test for transaction
+    a = Account('A100', 'John', 'Cleese', initial_balance=100)
+    print(a.make_transaction())
+
+    # test parse confirmation code
+    a = Account('A100', 'John', 'Cleese', initial_balance=100)
+    conf_code = a.make_transaction()
+    print(conf_code)
+
+    print(Account.parse_confirmation_code(conf_code))
+
+    # test parse confirmation code with timezone
+    print(Account.parse_confirmation_code(conf_code, TimeZone('MST', -7, 0)))
+
+    try:
+        Account.parse_confirmation_code('X-A100-asdasd-123')
     except ValueError as ex:
         print(ex)
 
