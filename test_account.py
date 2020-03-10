@@ -54,24 +54,34 @@ def main():
     except ValueError as ex:
         print(ex)
 
-    # test for transaction
-    a = Account('A100', 'John', 'Cleese', initial_balance=100)
-    print(a.make_transaction())
+    # # test for transaction
+    # a = Account('A100', 'John', 'Cleese', initial_balance=100)
+    # print(a.make_transaction())
 
-    # test parse confirmation code
-    a = Account('A100', 'John', 'Cleese', initial_balance=100)
-    conf_code = a.make_transaction()
-    print(conf_code)
+    # # test parse confirmation code
+    # a = Account('A100', 'John', 'Cleese', initial_balance=100)
+    # conf_code = a.make_transaction()
+    # print(conf_code)
+    #
+    # print(Account.parse_confirmation_code(conf_code))
 
-    print(Account.parse_confirmation_code(conf_code))
+    # # test parse confirmation code with timezone
+    # print(Account.parse_confirmation_code(conf_code, TimeZone('MST', -7, 0)))
+    #
+    # try:
+    #     Account.parse_confirmation_code('X-A100-asdasd-123')
+    # except ValueError as ex:
+    #     print(ex)
 
-    # test parse confirmation code with timezone
-    print(Account.parse_confirmation_code(conf_code, TimeZone('MST', -7, 0)))
+    # test transaction methods
+    a = Account('A100', 'Eric', 'Idle', TimeZone('MST', -7, 0), 100.0)
+    print(a.balance)
 
-    try:
-        Account.parse_confirmation_code('X-A100-asdasd-123')
-    except ValueError as ex:
-        print(ex)
+    a.deposit(100)
+    print(a.balance)
+
+    a.withdraw(100)
+    print(a.balance)
 
 
 if __name__ == '__main__':

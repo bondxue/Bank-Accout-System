@@ -93,9 +93,9 @@ class Account:
         dt_str = datetime.utcnow().strftime('%Y%m%d%H%M%S')
         return f'{transaction_code}-{self.account_number}-{dt_str}-{next(Account.transaction_counter)}'
 
-    # test transaction function
-    def make_transaction(self):
-        return self.generate_confirmation_code('dummy')
+    # # test transaction function
+    # def make_transaction(self):
+    #     return self.generate_confirmation_code('dummy')
 
     @staticmethod
     def parse_confirmation_code(confirmation_code, preferred_time_zone=None):
@@ -125,3 +125,47 @@ class Account:
         dt_preferred_str = f"{dt_preferred.strftime('%Y-%m-%d %H:%M:%S')} ({preferred_time_zone.name})"
 
         return Confirmation(account_number, transaction_code, transaction_id, dt_utc.isoformat(), dt_preferred_str)
+
+    def deposit(self, value):
+        if not isinstance(value, numbers.Real):
+            raise ValueError('Deposit value must be a real number.')
+        if value <= 0:
+            raise ValueError('Deposit value must be a positive number.')
+
+        # get transaction code
+        transaction_code = Account._transaction_codes['deposit']
+
+        # generate a confirmation code
+        conf_code = self.generate_confirmation_code(transaction_code)
+
+        # make deposit and return conf code
+        self._balance += value
+        return conf_code
+
+    def withdraw(self, value):
+        # TODO: refactor a function to validate a valid positive number
+        #       and use in __init__, deposit and
+
+        accepted = False
+        if self.balance - value < 0:
+            # insufficient funds - we'll reject this transaction
+            transaction_code = Account._transaction_codes['rejected']
+        else:
+            transaction_code = Account._transaction_codes['withdraw']
+            accepted = True
+
+        conf_code = self.generate_confirmation_code(transaction_code)
+
+        # Doing this here in case there's a problem generating a confirmation code
+        # - do not want to modify the balance if we cannot generate a transaction code successfully
+        if accepted:
+            self._balance -= value
+
+        return conf_code
+
+    def pay_interest(self):
+        interest = self.balance * Account.get_interest_rate() / 100
+        conf_code = self.generate_confirmation_code(Account._transaction_codes['interest'])
+        self._balance += interest
+        return conf_code
+
