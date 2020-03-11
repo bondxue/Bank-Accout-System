@@ -20,7 +20,7 @@ The system the following functionality and characteristics:
 -  contains method that, given a confirmation number, returns:
     - the account number, transaction code (D, W, etc), datetime (UTC format), date time (in whatever timezone is specified in te argument, but more human readable), the transaction ID
     
-For example, we may have an account with:
+For example, we have an account with:
 - account number `140568` 
 - preferred time zone offset of -7 (MST) 
 - an existing balance of `100.00`
@@ -31,7 +31,7 @@ The new balance should reflect `150.00` and the confirmation number returned sho
 
 ```D-140568-20190315145900-124```
 
-We also want a method that given the confirmation number returns an object with attributes:
+System also has a method that given the confirmation number returns an object with attributes:
 - `result.account_number` --> `140568`
 - `result.transaction_code` --> `D`
 - `result.transaction_id` --> `124`
