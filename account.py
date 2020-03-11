@@ -29,7 +29,7 @@ class Account:
             timezone = TimeZone('UTC', 0, 0)
         self.timezone = timezone
 
-        self._balance = float(initial_balance)
+        self._balance = Account.validate_real_number(initial_balance, min_value=0)
 
     @property
     def account_number(self):
@@ -86,6 +86,17 @@ class Account:
         if value is None or len(str(value).strip()) == 0:
             raise ValueError(f'{field_title} cannot be empty.')
         setattr(self, property_name, value)
+
+    @staticmethod
+    def validate_real_number(value, min_value=None):
+        if not isinstance(value, numbers.Real):
+            raise ValueError('Value must be a real number.')
+
+        if min_value is not None and value < min_value:
+            raise ValueError(f'Value must be at least {min_value}')
+
+        # validation passed, return valid value
+        return value
 
     def generate_confirmation_code(self, transaction_code):
         # main difficulty here is to generate the current time in UTC using this formatting:
